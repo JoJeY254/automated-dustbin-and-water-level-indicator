@@ -1,6 +1,6 @@
 # automated-dustbin-and-water-level-indicator
 
-# Group 3 
+# Group 9 
 ## Group Members
 
 | Name                 | Registration Number   |
