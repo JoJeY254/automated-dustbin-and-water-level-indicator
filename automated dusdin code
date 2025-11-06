@@ -1,0 +1,56 @@
+#include <Servo.h>
+Servo lidServo;
+const int trigPin = 9;
+const int echoPin = 10;
+long duration;
+int distance;
+
+void setup() {
+  Serial.begin(9600);
+  lidServo.attach(6);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  lidServo.write(0); // closed
+  delay(500);
+}
+
+int readDistanceCm() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  unsigned long dur = pulseIn(echoPin, HIGH, 30000UL); // 30ms timeout
+  if (dur == 0) return -1;
+  return (int)(dur * 0.034 / 2.0 + 0.5);
+}
+
+void smoothWrite(int fromDeg, int toDeg, int stepDelay=10) {
+  if (fromDeg < toDeg) {
+    for (int d = fromDeg; d <= toDeg; d++) { lidServo.write(d); delay(stepDelay); }
+  } else {
+    for (int d = fromDeg; d >= toDeg; d--) { lidServo.write(d); delay(stepDelay); }
+  }
+}
+
+void loop() {
+  distance = readDistanceCm();
+  if (distance < 0) {
+    Serial.println("No reading");
+  } else {
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
+  }
+
+  if (distance > 0 && distance < 15) {
+    Serial.println("Opening lid");
+    smoothWrite(0, 90, 8);
+    delay(2000);
+  } else {
+    Serial.println("Closing lid");
+    smoothWrite(90, 0, 8);
+  }
+  delay(200);
+}
