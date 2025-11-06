@@ -1,6 +1,6 @@
 # automated-dustbin-and-water-level-indicator
 
-# dustbin-
+# automated-dustbin
 autotomatic bin
 # Group 3 
 *Project:* Smart Waste Bin (Tinkercad simulation)
