@@ -1,0 +1,189 @@
+/*
+  Combined Water Level (HC-SR04) + Moisture Sensor Sketch
+  - HC-SR04:
+      TRIG -> 9
+      ECHO -> 10
+  - Buzzer:   -> 11
+  - Full LED: -> 12 (via 220Ω to LED anode; cathode -> GND)
+  - Moisture sensor: AO -> A0, VCC -> 5V, GND -> GND
+  - Moisture LED: -> 7 (via 220Ω)
+  - Optional pump control (use transistor/relay): -> 6
+
+  Behavior:
+  - distance <= FULL_THRESHOLD_CM  -> FULL: LED ON, buzzer OFF
+  - distance >= LOW_THRESHOLD_CM   -> LOW:  buzzer ON, LED OFF
+  - otherwise -> normal (both off)
+  - moisture analog >= MOISTURE_DRY_THRESHOLD -> DRY: moisture LED ON and optional pump ON
+  - moisture analog < MOISTURE_DRY_THRESHOLD  -> WET: moisture LED OFF and pump OFF
+
+  Safety: Use a transistor/relay driver for pumps; do not drive motors/pumps directly from Arduino pins.
+*/
+
+///// Pin configuration
+const int TRIG_PIN   = 9;
+const int ECHO_PIN   = 10;
+const int BUZZER_PIN = 11;
+const int FULL_LED   = 12;
+const int MOIST_LED  = 7;
+const int PUMP_PIN   = 6;   // optional: drive via transistor or relay
+const int MOIST_PIN  = A0;  // analog output from moisture sensor
+
+///// Ultrasonic thresholds (cm)
+const float FULL_THRESHOLD_CM = 5.0;
+const float LOW_THRESHOLD_CM  = 20.0;
+
+///// Moisture threshold (analogRead units 0-1023)
+// NOTE: many cheap moisture sensors return lower numbers when wet and higher when dry.
+// Adjust based on your calibration.
+const int MOISTURE_DRY_THRESHOLD = 700; // >= this considered DRY (tune for your sensor)
+
+///// Sampling & smoothing
+const int N_US_SAMPLES = 5;            // median smoothing for ultrasonic (odd number)
+const unsigned long SAMPLE_INTERVAL_MS = 300UL;
+const int MOISTURE_SAMPLES = 10;       // averaging for moisture
+
+///// Buzzer config
+const bool PASSIVE_BUZZER = false;     // true -> use tone(); false -> digital HIGH/LOW
+
+const unsigned long PULSE_TIMEOUT = 30000UL; // microseconds (~5 m max)
+
+unsigned long lastSampleTime = 0;
+
+void setup() {
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(FULL_LED, OUTPUT);
+  pinMode(MOIST_LED, OUTPUT);
+  pinMode(PUMP_PIN, OUTPUT);
+
+  digitalWrite(TRIG_PIN, LOW);
+  digitalWrite(BUZZER_PIN, LOW);
+  digitalWrite(FULL_LED, LOW);
+  digitalWrite(MOIST_LED, LOW);
+  digitalWrite(PUMP_PIN, LOW);
+
+  Serial.begin(9600);
+  Serial.println(F("\n=== Combined Water Level & Moisture Monitor ==="));
+  Serial.print(F("Full threshold (cm): ")); Serial.println(FULL_THRESHOLD_CM);
+  Serial.print(F("Low threshold  (cm): ")); Serial.println(LOW_THRESHOLD_CM);
+  Serial.print(F("Moisture dry threshold: ")); Serial.println(MOISTURE_DRY_THRESHOLD);
+  Serial.print(F("Buzzer mode: ")); Serial.println(PASSIVE_BUZZER ? F("PASSIVE (tone)") : F("ACTIVE (digital)"));
+}
+
+///// ---------- Ultrasonic Helper Functions ----------
+float readSingleDistanceCM() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  unsigned long duration = pulseIn(ECHO_PIN, HIGH, PULSE_TIMEOUT);
+  if (duration == 0) return -1.0; // out of range
+
+  // distance cm = (duration/2) * 0.0343
+  float dist = (duration / 2.0) * 0.0343;
+  return dist;
+}
+
+float readMedianDistanceCM() {
+  float arr[N_US_SAMPLES];
+  for (int i = 0; i < N_US_SAMPLES; ++i) {
+    arr[i] = readSingleDistanceCM();
+    delay(20);
+  }
+  // sort small array to get median
+  for (int i = 0; i < N_US_SAMPLES - 1; ++i) {
+    for (int j = i + 1; j < N_US_SAMPLES; ++j) {
+      if (arr[j] < arr[i]) {
+        float t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+      }
+    }
+  }
+  return arr[N_US_SAMPLES/2];
+}
+
+///// ---------- Moisture Helper ----------
+int readAverageMoisture() {
+  long sum = 0;
+  for (int i = 0; i < MOISTURE_SAMPLES; ++i) {
+    sum += analogRead(MOIST_PIN);
+    delay(10);
+  }
+  return (int)(sum / MOISTURE_SAMPLES);
+}
+
+///// ---------- Buzzer control ----------
+void setBuzzer(bool on) {
+  if (PASSIVE_BUZZER) {
+    if (on) tone(BUZZER_PIN, 2000); else noTone(BUZZER_PIN);
+  } else {
+    digitalWrite(BUZZER_PIN, on ? HIGH : LOW);
+  }
+}
+
+///// ---------- Main Loop ----------
+void loop() {
+  unsigned long now = millis();
+  if (now - lastSampleTime < SAMPLE_INTERVAL_MS) return;
+  lastSampleTime = now;
+
+  // read sensors
+  float distance = readMedianDistanceCM();
+  int moist = readAverageMoisture();
+
+  // Print diagnostics
+  if (distance < 0) {
+    Serial.print(F("Distance: OUT OF RANGE\t"));
+  } else {
+    Serial.print(F("Distance (cm): "));
+    Serial.print(distance, 2);
+    Serial.print("\t");
+  }
+  Serial.print(F("Moisture: "));
+  Serial.print(moist);
+  Serial.println();
+
+  // Ultrasonic-based state
+  bool isFull = false;
+  bool isLow  = false;
+  if (distance < 0) {
+    // treat as out-of-range; you may choose different behavior
+    isFull = false;
+    isLow = true; // optional: if no echo, treat as low
+  } else {
+    isFull = (distance <= FULL_THRESHOLD_CM);
+    isLow  = (distance >= LOW_THRESHOLD_CM);
+  }
+
+  // Moisture-based state
+  bool isDry = (moist >= MOISTURE_DRY_THRESHOLD); // adjust sign depending on sensor
+  // NOTE: for some sensors 0 = dry, 1023 = wet. If your sensor is reversed, invert condition.
+
+  // Act on ultrasonic
+  if (isFull) {
+    digitalWrite(FULL_LED, HIGH);
+    setBuzzer(false);
+  } else if (isLow) {
+    digitalWrite(FULL_LED, LOW);
+    setBuzzer(true);
+  } else {
+    digitalWrite(FULL_LED, LOW);
+    setBuzzer(false);
+  }
+
+  // Act on moisture
+  if (isDry) {
+    digitalWrite(MOIST_LED, HIGH);  // indicate dry
+    // Turn on pump (if present). Use transistor/relay driver — DO NOT connect pump directly.
+    digitalWrite(PUMP_PIN, HIGH);
+    Serial.println(F("MOISTURE: DRY -> Moisture LED ON, Pump ON"));
+  } else {
+    digitalWrite(MOIST_LED, LOW);
+    digitalWrite(PUMP_PIN, LOW);
+    Serial.println(F("MOISTURE: WET -> Moisture LED OFF, Pump OFF"));
+  }
+
+  // small delay handled by sample interval
+}
