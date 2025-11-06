@@ -8,7 +8,7 @@ autotomatic bin
 ## Contents
 - /screenshots/
   - 01_design_overview.png — full circuit/top view
-  - <img width="954" height="669" alt="image" src="https://github.com/user-attachments/assets/9ed9dc23-2cdd-4f4f-ac80-e5c86d807f2c" />
+  - <img width="554" height="369" alt="image" src="https://github.com/user-attachments/assets/9ed9dc23-2cdd-4f4f-ac80-e5c86d807f2c" />
 
   - 02_wiring_closeup.png — sensor/servo wiring
   - 03_simulation_running.png — simulation running screenshot
