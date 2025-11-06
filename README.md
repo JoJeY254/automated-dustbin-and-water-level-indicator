@@ -1,11 +1,22 @@
 # automated-dustbin-and-water-level-indicator
 
+# Group 3 
+## Group Members
+
+| Name                 | Registration Number   |
+|----------------------|-----------------------|
+ George Kareko         | BSCCS/2025/39770      |
+| Collins Brian        | BSCCS/2025/40048      |
+| Owiti Vivian Anyango | BSCCS/2024/59652      |
+| Elias Muchira Karimi | BSCCS/2025/40695      | 
+| Collins Brian        | BSCCS/2025/40048      | 
+| Ian Wanyama          | BSCCS/2025/39198      | 
+| Alier Bior           | BSCCS/2025/41621      |
+
 # automated-dustbin
 autotomatic bin
-# Group 3 
-*Project:* Smart Waste Bin (Tinkercad simulation)
-
 ## Contents
+
 - /screenshots/
   - 01_design_overview.png — full circuit/top view
   - <img width="554" height="369" alt="image" src="https://github.com/user-attachments/assets/9ed9dc23-2cdd-4f4f-ac80-e5c86d807f2c" />
