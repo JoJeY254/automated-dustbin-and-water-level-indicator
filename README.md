@@ -9,7 +9,7 @@
 | Collins Brian        | BSCCS/2025/40048      |
 | Owiti Vivian Anyango | BSCCS/2024/59652      |
 | Elias Muchira Karimi | BSCCS/2025/40695      | 
-| Collins Brian        | BSCCS/2025/40048      | 
+| Brian Chege          | BSCCS/2025/45559      | 
 | Ian Wanyama          | BSCCS/2025/39198      | 
 | Alier Bior           | BSCCS/2025/41621      |
 
