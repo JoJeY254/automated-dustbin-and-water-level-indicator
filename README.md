@@ -39,7 +39,8 @@ autotomatic bin
 ## Contents
 - /screenshots/
   - 01_design_overview.png — full circuit/top view  
-  - <img width="554" height="369" alt="image" src="https://github.com/user-attachments/assets/e838972a-099b-4645-8ee5-b09b0fa943c0" />
+<img width="554" height="369" alt="image" src="https://github.com/user-attachments/assets/2a9c9194-9098-4227-9264-6555dc4dfdb2" />
+
 
 
 - /code/  
