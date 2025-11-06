@@ -30,8 +30,13 @@ autotomatic bin
 3. Start the simulator.
 
 ## Notes
-- Ultrasonic HC-SR04 connected: VCC -> 5V, GND -> GND, TRIG -> D9, ECHO -> D10
-- Servo connected: Signal -> D3, VCC -> 5V, GND -> GND
+The ultrasonic sensor (HC-SR04) detects when a person’s hand or object comes near the dustbin lid.
+
+The Arduino reads the sensor data and activates the servo motor.
+
+The servo motor automatically opens the lid when an object is detected within a set distance.
+
+After a short delay, the servo motor closes the lid again once the object is removed.
 
 
 # automated-dustbin-and-water-level-indicator
@@ -54,23 +59,13 @@ autotomatic bin
    - Buzzer sounds when the water tank is full.  
 
 ## Notes  
-- **Ultrasonic Sensor (HC-SR04) Connections:**  
-  - VCC → 5V  
-  - GND → GND  
-  - TRIG → D7  
-  - ECHO → D6  
 
-- **LED Indicators:**  
-  - Green LED → D2 (Low level)  
-  - Yellow LED → D3 (Medium level)  
-  - Red LED → D4 (High level)  
-
-- **Buzzer:**  
-  - Signal → D5  
-  - VCC → 5V  
-  - GND → GND  
 
 - **Operation:**  
-  - The sensor measures distance to the water surface.  
-  - As water rises, LEDs turn on one by one.  
-  - When the tank is full, the red LED lights and the buzzer activates. 
+The ultrasonic sensor (HC-SR04) measures the distance between the water surface and the sensor at the top of the tank.
+
+The Arduino processes the distance data and determines the current water level.
+
+LEDs (green, yellow, red) light up one by one to indicate low, medium, and high water levels.
+
+When the tank is full, the buzzer automatically sounds an alert to prevent overflow.
