@@ -17,11 +17,11 @@
 autotomatic bin
 ## Contents
 
-- /screenshots/
+- screenshots
   - 01_design_overview.png — full circuit/top view
   - <img width="554" height="369" alt="image" src="https://github.com/user-attachments/assets/9ed9dc23-2cdd-4f4f-ac80-e5c86d807f2c" />
 
-- /code/
+- code
   - project.ino — Arduino code used in Tinkercad
 
 ## How to run
@@ -37,13 +37,13 @@ autotomatic bin
 # automated-dustbin-and-water-level-indicator
 
 ## Contents
-- /screenshots/
+- screenshots
   - 01_design_overview.png — full circuit/top view  
 <img width="554" height="369" alt="image" src="https://github.com/user-attachments/assets/2a9c9194-9098-4227-9264-6555dc4dfdb2" />
 
 
 
-- /code/  
+- code  
   - water_level.ino — Arduino code used in Tinkercad  
 
 ## How to run  
