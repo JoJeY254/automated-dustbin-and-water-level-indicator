@@ -39,7 +39,7 @@ The servo motor automatically opens the lid when an object is detected within a 
 After a short delay, the servo motor closes the lid again once the object is removed.
 
 
-# automated-dustbin-and-water-level-indicator
+# water-level-indicator
 
 ## Contents
 - screenshots
