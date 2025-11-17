@@ -44,7 +44,7 @@ After a short delay, the servo motor closes the lid again once the object is rem
 ## Contents
 - screenshots
   - 01_design_overview.png — full circuit/top view  
-<img width="554" height="369" alt="image" src="https://github.com/user-attachments/assets/2a9c9194-9098-4227-9264-6555dc4dfdb2" />
+<img width="541" height="369" alt="image" src="https://github.com/user-attachments/assets/864afed2-3a69-4659-aa6a-d1f8ba747a2b" />
 
 
 
